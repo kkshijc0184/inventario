@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inventario y Pr&#233;stamos</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#0a3526" />
+    <link rel="apple-touch-icon" href="icon-192.png" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Inventario" />
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () =>
+          navigator.serviceWorker.register("sw.js").catch(() => {}),
+        );
+      }
+    </script>
+    <!-- Fuentes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;600;700;800&family=Figtree:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Libreria Excel (para exportar el inventario) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <!-- Libreria de notificaciones y dialogos (SweetAlert2) -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+      // Aplica la identidad visual de la app a todos los dialogos de SweetAlert2.
+      if (window.Swal) {
+        window.Swal = Swal.mixin({
+          buttonsStyling: false,
+          reverseButtons: true,
+          focusCancel: false,
+          customClass: { popup: "app-swal2" },
+        });
+      }
+    </script>
+
+    <!-- Estilos propios -->
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/inventario.css" />
+  </head>
+  <body>
+    <div
+      id="appLoadError"
+      class="login-error"
+      hidden
+      style="max-width: 520px; margin: 30px auto"
+    ></div>
+    <div class="app" id="appRoot" hidden>
+      <header>
+        <div>
+          <h1>&#128230; Inventario y Pr&#233;stamos</h1>
+          <div class="sub">Control de bienes patrimoniales y pr&#233;stamo de recursos</div>
+        </div>
+        <div class="header-right">
+          <div class="user-badge" id="userBadge" hidden></div>
+          <button class="btn secondary small" id="logoutBtn" type="button">
+            &#128274; Salir
+          </button>
+        </div>
+      </header>
+
+      <nav class="tabs">
+        <button data-tab="inventario" class="active">Inventario</button>
+        <button data-tab="prestamos">Pr&#233;stamos</button>
+        <button data-tab="docentes">Docentes</button>
+      </nav>
+
+      <!-- INVENTARIO -->
+      <section class="panel active" id="panel-inventario">
+        <nav class="subtabs">
+          <button data-subtab="inv-bienes" class="active">Bienes</button>
+          <button data-subtab="inv-lista">Inventario de bienes</button>
+          <button data-subtab="inv-historial">Historial de cambios</button>
+        </nav>
+
+        <div class="subpanel active" id="inv-bienes">
+          <div class="request-summary" id="invStats"></div>
+        </div>
+
+        <div class="subpanel" id="inv-lista">
+          <div class="card">
+            <h2>Inventario de bienes</h2>
+            <p class="hint" id="invAvisoLectura" hidden>
+              &#128065;&#65039; Modo solo lectura: puedes consultar y exportar el inventario,
+              pero solo el encargado puede modificarlo.
+            </p>
+            <div class="filters">
+              <div class="field">
+                <label>Buscar</label>
+                <input type="text" id="invSearch" placeholder="Nombre, marca, serie o c&#243;digo..." />
+              </div>
+              <div class="field">
+                <label>Categor&#237;a</label>
+                <select id="invCat"></select>
+              </div>
+              <div class="field">
+                <label>Situaci&#243;n</label>
+                <select id="invSit">
+                  <option value="A">Bienes activos</option>
+                  <option value="B">De baja</option>
+                  <option value="T">Todos</option>
+                </select>
+              </div>
+              <div class="field inv-check-field">
+                <label><input type="checkbox" id="invSoloSinSerie" /> Solo sin serie</label>
+              </div>
+            </div>
+            <div class="inv-toolbar">
+              <button class="btn small" id="invAddBtn" type="button">+ Agregar bien</button>
+              <button class="btn secondary small" id="invExcelBtn" type="button">&#128229; Exportar Excel</button>
+              <button class="btn secondary small" id="invPdfBtn" type="button">&#128424;&#65039; Exportar PDF</button>
+            </div>
+            <div id="invResumen"></div>
+            <div class="pag-controls">
+              <label class="pag-label"
+                >Mostrar:
+                <select id="pagSizeInv">
+                  <option value="10" selected>10</option>
+                  <option value="20">20</option>
+                  <option value="50">50</option>
+                  <option value="9999">Todos</option>
+                </select>
+                por p&#225;gina
+              </label>
+              <div id="pagInfoInv" class="pag-info"></div>
+            </div>
+            <div id="invTableWrap"><div class="empty">Cargando inventario...</div></div>
+            <div id="pagNavInv" class="pag-nav"></div>
+          </div>
+        </div>
+
+        <div class="subpanel" id="inv-historial">
+          <div class="card">
+            <h2>Historial de cambios</h2>
+            <p class="hint">
+              Cada alta, edici&#243;n, baja, pr&#233;stamo y devoluci&#243;n queda registrado con
+              la persona, la fecha y la hora. Nadie puede borrar ni alterar este historial.
+            </p>
+            <div class="filters">
+              <div class="field">
+                <label>Buscar</label>
+                <input type="text" id="hisSearch" placeholder="Bien, usuario, acci&#243;n..." />
+              </div>
+              <div style="display: flex; align-items: flex-end">
+                <button class="btn secondary small" id="hisReloadBtn" type="button">&#8635; Actualizar</button>
+              </div>
+            </div>
+            <div class="pag-controls">
+              <label class="pag-label"
+                >Mostrar:
+                <select id="pagSizeHis">
+                  <option value="10" selected>10</option>
+                  <option value="20">20</option>
+                  <option value="50">50</option>
+                </select>
+                por p&#225;gina
+              </label>
+              <div id="pagInfoHis" class="pag-info"></div>
+            </div>
+            <div id="hisTableWrap"><div class="empty">Abre esta pesta&#241;a para cargar el historial.</div></div>
+            <div id="pagNavHis" class="pag-nav"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PRESTAMOS -->
+      <section class="panel" id="panel-prestamos">
+        <div class="dashboard-head">
+          <div>
+            <div class="dashboard-kicker">Recursos tecnol&#243;gicos</div>
+            <h2>Pr&#233;stamos</h2>
+            <p class="hint" id="prAvisoLectura" hidden>
+              &#128065;&#65039; Modo solo lectura: puedes consultar los pr&#233;stamos,
+              pero solo el encargado puede registrarlos.
+            </p>
+          </div>
+        </div>
+        <div id="prAlerta"></div>
+
+        <nav class="subtabs">
+          <button data-subtab="pr-resumen" class="active">Resumen</button>
+          <button data-subtab="pr-nuevo">Nuevo pr&#233;stamo</button>
+          <button data-subtab="pr-historial">Historial de pr&#233;stamos</button>
+        </nav>
+
+        <div class="subpanel active" id="pr-resumen">
+        <div class="request-summary" id="prStats"></div>
+        </div>
+
+        <div class="subpanel" id="pr-nuevo">
+        <div class="card" id="prFormCard">
+          <h2>Nuevo pr&#233;stamo</h2>
+          <div class="pr-row">
+            <div class="field pr-grow">
+              <label>Bien (escribe el c&#243;digo o el nombre)</label>
+              <input type="text" id="prBien" list="prBienesList" placeholder="Ej. JEC-0001 o proyector" autocomplete="off" />
+              <datalist id="prBienesList"></datalist>
+            </div>
+            <div class="field pr-cant">
+              <label>Cantidad</label>
+              <input type="number" id="prCant" min="1" value="1" disabled />
+            </div>
+            <div class="pr-btn">
+              <button class="btn secondary small" id="prAddBtn" type="button">+ Agregar a la lista</button>
+            </div>
+          </div>
+          <div id="prCarrito" class="pr-carrito"></div>
+          <div class="pr-row">
+            <div class="field pr-grow">
+              <label>Docente</label>
+              <div style="display:flex;gap:8px">
+                <select id="prDocente" style="flex:1"></select>
+                <button class="btn secondary small" id="prNuevoDocenteBtn" type="button" title="Agregar un docente nuevo">+ Nuevo</button>
+              </div>
+            </div>
+            <div class="field pr-grow">
+              <label>Aula / grado</label>
+              <input type="text" id="prAula" placeholder="Ej. 5&#176; A" />
+            </div>
+            <div class="field pr-hora">
+              <label>Hora de salida</label>
+              <input type="time" id="prHora" />
+            </div>
+          </div>
+          <div class="pr-row">
+            <div class="field pr-grow">
+              <label>Observaci&#243;n (opcional)</label>
+              <input type="text" id="prObs" placeholder="Ej. Cable HDMI incluido" />
+            </div>
+            <div class="pr-btn">
+              <button class="btn small" id="prRegistrarBtn" type="button">Registrar pr&#233;stamo</button>
+            </div>
+          </div>
+          <p class="hint">Si dejas la hora vac&#237;a se usa la hora actual. La devoluci&#243;n registra su hora sola.</p>
+        </div>
+        </div>
+
+        <div class="subpanel" id="pr-historial">
+        <div class="card">
+          <h2>Historial de pr&#233;stamos</h2>
+          <div class="filters">
+            <div class="field">
+              <label>Buscar</label>
+              <input type="text" id="prBuscar" placeholder="Docente, aula o bien..." />
+            </div>
+            <div class="field">
+              <label>Estado</label>
+              <select id="prEstado">
+                <option value="">Todos</option>
+                <option value="prestado">Pendientes de devolver</option>
+                <option value="devuelto">Devueltos</option>
+                <option value="anulado">Anulados</option>
+              </select>
+            </div>
+          </div>
+          <div class="pag-controls">
+            <label class="pag-label"
+              >Mostrar:
+              <select id="pagSizePre">
+                <option value="10" selected>10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+                <option value="9999">Todos</option>
+              </select>
+              por p&#225;gina
+            </label>
+            <div id="pagInfoPre" class="pag-info"></div>
+          </div>
+          <div id="prTableWrap"><div class="empty">Cargando pr&#233;stamos...</div></div>
+          <div id="pagNavPre" class="pag-nav"></div>
+        </div>
+        </div>
+      </section>
+
+      <!-- DOCENTES -->
+      <section class="panel" id="panel-docentes">
+        <div class="dashboard-head">
+          <div>
+            <div class="dashboard-kicker">Qui&#233;nes reciben pr&#233;stamos</div>
+            <h2>Docentes</h2>
+            <p class="hint" id="docAvisoLectura" hidden>
+              &#128065;&#65039; Modo solo lectura: solo el encargado puede modificar la lista de docentes.
+            </p>
+          </div>
+        </div>
+        <div class="request-summary" id="docStats"></div>
+
+        <div class="card" id="docFormCard">
+          <h2>Agregar docentes</h2>
+          <div class="field">
+            <label>Nombres (uno por l&#237;nea; puedes pegar toda la lista)</label>
+            <textarea id="docNuevos" rows="4" placeholder="Ej.&#10;PEREZ LOPEZ, ANA&#10;GARCIA RUIZ, JUAN" style="width:100%"></textarea>
+          </div>
+          <div class="inv-toolbar" style="margin-top:12px">
+            <button class="btn small" id="docAddBtn" type="button">+ Agregar</button>
+            <button class="btn secondary small" id="docImportBtn" type="button">&#128194; Importar desde Excel</button>
+            <button class="btn secondary small" id="docPlantillaBtn" type="button">&#128229; Descargar plantilla</button>
+            <input type="file" id="docImportInput" accept=".xlsx,.xls,.csv" hidden />
+          </div>
+          <p class="hint">El Excel necesita una columna <b>nombre</b>. Opcional: <b>activo</b> (SI/NO). Los que ya existen se omiten.</p>
+        </div>
+
+        <div class="card">
+          <h2>Lista de docentes</h2>
+          <div class="filters">
+            <div class="field">
+              <label>Buscar</label>
+              <input type="text" id="docBuscar" placeholder="Nombre..." />
+            </div>
+            <div style="display: flex; align-items: flex-end">
+              <button class="btn secondary small" id="docReloadBtn" type="button">&#8635; Actualizar</button>
+            </div>
+          </div>
+          <div class="pag-controls">
+            <label class="pag-label"
+              >Mostrar:
+              <select id="pagSizeDoc">
+                <option value="10" selected>10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+                <option value="9999">Todos</option>
+              </select>
+              por p&#225;gina
+            </label>
+            <div id="pagInfoDoc" class="pag-info"></div>
+          </div>
+          <div id="docTableWrap"><div class="empty">Cargando docentes...</div></div>
+          <div id="pagNavDoc" class="pag-nav"></div>
+        </div>
+      </section>
+    </div>
+    <!-- /#appRoot -->
+    <script src="app.js"></script>
+    <!-- Solo visual: rotula las celdas para mostrar las tablas como tarjetas en celular -->
+    <script src="js/ui-tablas-movil.js" defer></script>
+  </body>
+</html>

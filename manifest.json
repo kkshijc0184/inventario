@@ -1,0 +1,15 @@
+{
+  "name": "Inventario y Préstamos",
+  "short_name": "Inventario",
+  "description": "Control de bienes patrimoniales y préstamo de recursos",
+  "start_url": "index.html",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#edf2ee",
+  "theme_color": "#0a3526",
+  "orientation": "portrait-primary",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
