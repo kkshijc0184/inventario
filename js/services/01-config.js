@@ -2,8 +2,8 @@
 // Pega aquí los datos de TU proyecto (Supabase > Project Settings > API):
 //   SUPA_URL: la "Project URL"
 //   SUPA_KEY: la clave pública (publishable / anon). NUNCA uses la service_role.
-const SUPA_URL = 'https://kkatnxsudgfukproekfs.supabase.co';
-const SUPA_KEY = 'sb_publishable_67pVfP4ZF7VzWMyoEmJsww_EgBML8nD';
+const SUPA_URL = 'https://eoappuatefjzqxpggvxq.supabase.co';
+const SUPA_KEY = 'sb_publishable_j7J4Mo2_PukP7N4aDM2TTg_JcUH0BaT';
 
 // Prefijo para guardar datos locales del navegador (sesión).
 const LS_PREFIX = 'inventario:';
