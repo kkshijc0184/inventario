@@ -124,7 +124,8 @@ function renderInventario(){
     return `<tr class="${b.baja ? 'inv-baja' : ''}">
       <td class="inv-code">${escapeHtml(b.id)}</td>
       <td>${escapeHtml(b.denominacion)}${b.cantidad ? ` <span class="inv-lote">Lote × ${b.cantidad}</span>` : ''}${notaBaja}</td>
-      <td>${escapeHtml(((b.marca || '') + ' ' + (b.modelo || '')).trim() || '—')}</td>
+      <td>${escapeHtml(b.marca || "")}</td>
+      <td>${escapeHtml(b.modelo || "")}</td>
       <td>${escapeHtml(b.caracteristicas || '')}</td>
       <td>${serie}</td>
       <td>${escapeHtml(b.baja ? 'Baja' : b.estado)}</td>
@@ -134,7 +135,18 @@ function renderInventario(){
   }).join('');
 
   invEl('invTableWrap').innerHTML = `<div class="inv-scroll"><table>
-    <thead><tr><th>Código</th><th>Denominación</th><th>Marca / modelo</th><th>Caract.</th><th>Serie</th><th>Estado</th><th>Disponibilidad</th><th></th></tr></thead>
+    <thead>
+    <tr>
+    <th>Código</th>
+    <th>Denominación</th>
+    <th>Marca</th>
+    <th>Modelo</>
+    <th>Caract.</th>
+    <th>Serie</th>
+    <th>Estado</th>
+    <th>Disponibilidad</th>
+    <th></th></tr>
+    </thead>
     <tbody>${filas}</tbody></table></div>`;
   buildPagNav('pagNavInv', totalPaginas, pagInv, (p)=>{ pagInv = p; renderInventario(); });
 }
