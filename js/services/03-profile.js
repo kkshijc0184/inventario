@@ -24,6 +24,8 @@ async function sbFetch(path, opts={}){
       'apikey': SUPA_KEY,
       'Authorization': 'Bearer ' + token,
       'Content-Type': 'application/json',
+      'Accept-Profile': 'public',
+      'Content-Profile': 'public',
       'Prefer': opts.prefer || 'return=representation',
       ...( opts.headers || {} )
     },
