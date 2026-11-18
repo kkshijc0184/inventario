@@ -300,3 +300,13 @@ create policy docentes_delete on public.docentes for delete using (public.es_adm
 --   public.bienes,
 --   public.docentes
 -- restart identity cascade;
+
+-- =====================================================================
+-- CAMBIO DE CATEGORÍAS (solo si ya tenías bienes registrados con las
+-- categorías anteriores). Ejecutar a mano UNA vez: quita los "--".
+-- Las categorías ahora son solo: "Equipo tecnológico" y "Equipo de oficina".
+-- =====================================================================
+-- update public.bienes set categoria = 'Equipo tecnológico' where categoria = 'Equipo de cómputo';
+-- -- Si tienes bienes en "Unidades de transporte y maquinarias" o "Talleres",
+-- -- cámbialos a la categoría que corresponda, por ejemplo:
+-- -- update public.bienes set categoria = 'Equipo tecnológico' where categoria in ('Unidades de transporte y maquinarias', 'Talleres');
