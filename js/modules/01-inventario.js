@@ -296,9 +296,7 @@ function categoriasMarcadas(lista){
   lista.forEach(b => { h[b.categoria] = true; });
   return [
     ['EQUIPO DE OFICINA', h['Equipo de oficina']],
-    ['UNIDADES DE TRANSPORTE, MAQUINARIAS', h['Unidades de transporte y maquinarias']],
-    ['EQUIPO DE COMPUTO', h['Equipo de cómputo']],
-    ['TALLERES', h['Talleres']]
+    ['EQUIPO TECNOLOGICO', h['Equipo tecnológico']],
   ];
 }
 
