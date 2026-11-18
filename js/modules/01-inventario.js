@@ -140,7 +140,7 @@ function renderInventario(){
     <th>Código</th>
     <th>Denominación</th>
     <th>Marca</th>
-    <th>Modelo</>
+    <th>Modelo</th>
     <th>Caract.</th>
     <th>Serie</th>
     <th>Estado</th>
@@ -295,8 +295,8 @@ function categoriasMarcadas(lista){
   const h = {};
   lista.forEach(b => { h[b.categoria] = true; });
   return [
-    ['EQUIPO DE OFICINA', h['Equipo de oficina']],
-    ['EQUIPO TECNOLOGICO', h['Equipo tecnológico']],
+    ['EQUIPO TECNOLÓGICO', h['Equipo tecnológico']],
+    ['EQUIPO DE OFICINA', h['Equipo de oficina']]
   ];
 }
 
