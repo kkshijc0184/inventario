@@ -31,3 +31,14 @@ La restricción real está en las políticas RLS del SQL, no solo en la pantalla
 - Nuevo: tabla `perfiles` incluida en el SQL (antes se asumía que ya existía).
 - Las cuentas se crean desde el panel de Supabase (ya no hay pantalla de usuarios).
 - Los íconos (`icon-192.png`, `icon-512.png`) son los de RECOIN: reemplázalos si quieres otro logo.
+
+## Etiquetas (stickers)
+
+Inventario > **Etiquetas**: marca los bienes y pulsa *Generar etiquetas*. Se abre una vista previa con hojas A4
+de stickers circulares (escudo, nombre de la I.E. en arco, código y serie) con las medidas del modelo de 60 mm
+(12 por hoja). Desde ahí: *Imprimir / Guardar como PDF* (tamaño A4, márgenes «Ninguno», escala 100 %).
+
+- Los equipos prioritarios (laptops, proyectores, computadoras, tablets, monitores/TV, impresoras, audio y cámaras)
+  salen primero. Las palabras que los detectan están en `ETQ_GRUPOS` (`js/modules/04-etiquetas.js`).
+- Tamaños: 60, 45 o 35 mm. Opciones: incluir serie, contorno de corte magenta y una etiqueta por unidad en lotes.
+- Por defecto solo se etiquetan los bienes en estado **Bueno** (filtro «Estado»: también puede incluir regulares o todos). Los bienes dados de baja nunca se etiquetan. Lo pueden usar el administrador y el directivo.

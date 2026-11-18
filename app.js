@@ -25,6 +25,7 @@
       'js/modules/01-inventario.js',
       'js/modules/02-prestamos.js',
       'js/modules/03-docentes.js',
+      'js/modules/04-etiquetas.js',
       'js/core/app-events.js'
     ];
     for(const file of modules){

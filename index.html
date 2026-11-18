@@ -83,6 +83,7 @@
         <nav class="subtabs">
           <button data-subtab="inv-bienes" class="active">Bienes</button>
           <button data-subtab="inv-lista">Inventario de bienes</button>
+          <button data-subtab="inv-etiquetas">Etiquetas</button>
           <button data-subtab="inv-historial">Historial de cambios</button>
         </nav>
 
@@ -139,6 +140,78 @@
             </div>
             <div id="invTableWrap"><div class="empty">Cargando inventario...</div></div>
             <div id="pagNavInv" class="pag-nav"></div>
+          </div>
+        </div>
+
+        <div class="subpanel" id="inv-etiquetas">
+          <div class="card">
+            <h2>Etiquetas (stickers)</h2>
+            <p class="hint">
+              Elige los bienes y genera hojas A4 con stickers circulares con el escudo de la I.E.,
+              el c&#243;digo y la serie del equipo. Los equipos prioritarios (laptops, proyectores&#8230;)
+              aparecen primero.
+            </p>
+            <div class="filters">
+              <div class="field">
+                <label>Buscar</label>
+                <input type="text" id="etqBuscar" placeholder="C&#243;digo, nombre, marca o serie..." />
+              </div>
+              <div class="field">
+                <label>Mostrar</label>
+                <select id="etqTipo"></select>
+              </div>
+              <div class="field">
+                <label>Estado</label>
+                <select id="etqEstado">
+                  <option value="B" selected>Solo buenos</option>
+                  <option value="BR">Buenos y regulares</option>
+                  <option value="T">Todos (incluye malos)</option>
+                </select>
+              </div>
+              <div class="field inv-check-field">
+                <label><input type="checkbox" id="etqSoloSerie" /> Solo con serie</label>
+              </div>
+            </div>
+            <div class="filters">
+              <div class="field">
+                <label>Tama&#241;o del sticker</label>
+                <select id="etqTam">
+                  <option value="60">60 mm (igual al modelo)</option>
+                  <option value="45">45 mm</option>
+                  <option value="35">35 mm</option>
+                </select>
+              </div>
+              <div class="field inv-check-field">
+                <label><input type="checkbox" id="etqMostrarSerie" checked /> Incluir la serie</label>
+              </div>
+              <div class="field inv-check-field">
+                <label><input type="checkbox" id="etqCorte" checked /> Contorno de corte (magenta)</label>
+              </div>
+              <div class="field inv-check-field">
+                <label><input type="checkbox" id="etqLotes" /> Lotes: una etiqueta por unidad</label>
+              </div>
+            </div>
+            <div class="inv-toolbar">
+              <button class="btn small" id="etqGenerarBtn" type="button" disabled>&#127991;&#65039; Generar etiquetas</button>
+              <button class="btn secondary small" id="etqSelTodosBtn" type="button">Seleccionar los de la lista</button>
+              <button class="btn secondary small" id="etqSelNingunoBtn" type="button">Quitar selecci&#243;n</button>
+            </div>
+            <p class="hint" id="etqResumen">Marca los bienes que quieres etiquetar.</p>
+            <div class="pag-controls">
+              <label class="pag-label"
+                >Mostrar:
+                <select id="pagSizeEtq">
+                  <option value="10">10</option>
+                  <option value="20" selected>20</option>
+                  <option value="50">50</option>
+                  <option value="9999">Todos</option>
+                </select>
+                por p&#225;gina
+              </label>
+              <div id="pagInfoEtq" class="pag-info"></div>
+            </div>
+            <div id="etqTableWrap"><div class="empty">Cargando inventario...</div></div>
+            <div id="pagNavEtq" class="pag-nav"></div>
           </div>
         </div>
 
